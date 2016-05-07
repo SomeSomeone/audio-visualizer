@@ -6,6 +6,7 @@
   </head>
   <body>
     <p></p>
+    <h3></h3>
     <button onclick="pause()">Stop</button>
     <button onclick="play()">Start</button>
     <button onclick="rePlay()">Re-Start</button>
@@ -18,19 +19,29 @@
     scene = new jumpBox();
     scene.scene(document.getElementById('some-big-div'));//, {/*some options*/ });
     // создаем аудио контекст
+    
+    //основные элементы
     var context;      //основной контекст
-    var bufferLoader; //для загрузки
     var source;       //источик
+    var analyser;     //аналзатор
+    //помошники
+    var bufferLoader; //для загрузки
+    var streamData;   //свеже взятые данные с потока
+    var result;       //подсчитанные данные
     var urlCatalog;   //все ссылки
     var timeStop;     //время остановки
     var timeStart;    //время начала
+
     //инициализируем
     window.onload = init;
     function init() {
       window.AudioContext = window.AudioContext || window.webkitAudioContext;
       context = new AudioContext();
+      analyser=context.createAnalyser();
+      analyser.connect(context.destination)
+      
       urlCatalog=['_ghost_-_Reverie_(small_theme).mp3'];
-
+      
       bufferLoader = new BufferLoader(context,urlCatalog[0]);
       bufferLoader.load();
     }
@@ -38,11 +49,28 @@
     function connections(bufferList) {
       source = context.createBufferSource();
       source.buffer = bufferList;
-      source.connect(context.destination);     
+      source.connect(analyser);     
     }
     function deconnections(){
       source.stop();
       source=0;
+    }
+
+    var run =setInterval(checkAudio, 20);
+    function checkAudio(){
+      if(!source)return;
+      streamData=new Uint8Array(125);
+      result=[0,0,0,0,0];
+
+      analyser.getByteFrequencyData(streamData);
+      for (var i = streamData.length - 1; i >= 0; i--){
+        result[parseInt(i/25)]+= streamData[i];
+      }
+      for (var i =  result.length - 1; i >= 0; i--) {
+         result[i]>>=6 ;//    result/(25*256)*100 ->result/64 ->result>>6
+      };
+      scene.jump(result);
+      $("h3").text( 'сейчас ' + result );
     }
     function BufferLoader(context, url) {
       this.context = context;
@@ -91,8 +119,10 @@
 
 
     function pause() {
+
       // сначала засекаем время потом останавливаем , ибо потом пропадает пару милисекунд.
       if(!source)return;
+      scene.jump([0,0,0,0,0]);
       timeStop += context.currentTime - timeStart-0.4;
       deconnections();
     }
