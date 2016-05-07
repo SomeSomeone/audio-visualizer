@@ -1,0 +1,118 @@
+<html>
+  <head>
+    <title>Jump box</title>
+    <link rel="stylesheet" type="text/css" href="index.css">
+    <meta charset="utf-8">
+  </head>
+  <body>
+    <p></p>
+    <button onclick="pause()">Stop</button>
+    <button onclick="play()">Start</button>
+    <button onclick="rePlay()">Re-Start</button>
+    <div id="some-big-div"></div>
+  </body>
+  <script src="jquery-2.2.3.min.js" type="text/javascript"></script>
+  <script type="text/javascript" src="jump-box.js"></script>
+  <script type="text/javascript">
+    var scene;
+    scene = new jumpBox();
+    scene.scene(document.getElementById('some-big-div'));//, {/*some options*/ });
+    // создаем аудио контекст
+    var context;      //основной контекст
+    var bufferLoader; //для загрузки
+    var source;       //источик
+    var urlCatalog;   //все ссылки
+    var timeStop;     //время остановки
+    var timeStart;    //время начала
+    //инициализируем
+    window.onload = init;
+    function init() {
+      window.AudioContext = window.AudioContext || window.webkitAudioContext;
+      context = new AudioContext();
+      urlCatalog=['_ghost_-_Reverie_(small_theme).mp3'];
+
+      bufferLoader = new BufferLoader(context,urlCatalog[0]);
+      bufferLoader.load();
+    }
+
+    function connections(bufferList) {
+      source = context.createBufferSource();
+      source.buffer = bufferList;
+      source.connect(context.destination);     
+    }
+    function deconnections(){
+      source.stop();
+      source=0;
+    }
+    function BufferLoader(context, url) {
+      this.context = context;
+      this.url = url;
+      this.bufferList = 0;
+      this.loadCount = 0;
+    }
+    BufferLoader.prototype.load = function() {
+      var request = new XMLHttpRequest();
+      request.open("GET", this.url, true);
+      request.responseType = "arraybuffer";
+
+    
+      var loader = this;
+
+      request.onload = function() {
+        // Asynchronously decode the audio file data in request.response
+        loader.context.decodeAudioData(
+          request.response,
+          function(buffer) {
+            if (!buffer) {
+              alert('error decoding file data: ' + this.url);
+              return;
+            }
+            loader.bufferList = buffer;
+            console.log('I do it!');
+            console.log(buffer);
+
+            rePlay(loader.bufferList);
+            
+          },
+          function(error) {
+            console.error('decodeAudioData error', error);
+          }
+        );
+      }
+
+      request.onerror = function() {
+        alert('BufferLoader: XHR error');
+      }
+      request.send();
+      request.onprogress = function(event) {
+        $("p").text( 'Получено с сервера ' + event.loaded + ' байт из ' + event.total );
+      }
+    }
+
+
+    function pause() {
+      // сначала засекаем время потом останавливаем , ибо потом пропадает пару милисекунд.
+      if(!source)return;
+      timeStop += context.currentTime - timeStart-0.4;
+      deconnections();
+    }
+    function play(buffer) {
+      buffer=buffer||bufferLoader.bufferList;
+      if(source||!buffer)return;
+      connections(buffer);
+      timeStart=context.currentTime;
+      source.start(0, timeStop % buffer.duration);
+      
+    }
+    function rePlay(buffer) {
+      buffer=buffer||bufferLoader.bufferList;
+      if(!buffer)return;
+      if(source)deconnections();
+      
+      connections(buffer);
+      timeStop=0;
+      timeStart=context.currentTime;
+      source.start(0);
+    }
+  </script>
+</html>

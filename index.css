@@ -1,0 +1,44 @@
+body{
+	margin:0;
+}
+
+#some-big-div{
+	background-color:black;
+/*	
+	width:100%;
+	height:100vh;
+*/
+	width:90%;
+	height:90%;
+
+}
+
+
+/*jump box*/
+.jump-box-scene{
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background: #F9A006;
+}
+.jump-box-panel{
+	position: absolute;
+    background: #272626;
+    width: 80%;
+    height: 12.5%;
+    bottom: 0;
+    left: 10%;
+}
+
+.jump-box{
+	position: absolute;
+    bottom: 25%;
+
+    width: 10%;
+    background: #FF0023;
+}
+.jump-box:after {
+  content: "";
+  display: block;
+  padding-bottom: 100%;
+}
