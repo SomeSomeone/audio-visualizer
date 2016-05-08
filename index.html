@@ -7,150 +7,15 @@
   <body>
     <p></p>
     <h3></h3>
+
     <button onclick="pause()">Stop</button>
     <button onclick="play()">Start</button>
     <button onclick="rePlay()">Re-Start</button>
     <div id="some-big-div"></div>
+    </div>
   </body>
   <script src="jquery-2.2.3.min.js" type="text/javascript"></script>
   <script type="text/javascript" src="jump-box.js"></script>
   
-  <script type="text/javascript">
-    var scene;
-    scene = new jumpBox();
-    scene.scene(document.getElementById('some-big-div'));//, {/*some options*/ });
-    // создаем аудио контекст
-    
-    //основные элементы
-    var context;      //основной контекст
-    var source;       //источик
-    var analyser;     //аналзатор
-    //помошники
-    var bufferLoader; //для загрузки
-    var streamData;   //свеже взятые данные с потока
-    var result;       //подсчитанные данные
-    var resultHelper
-    var urlCatalog;   //все ссылки
-    var timeStop;     //время остановки
-    var timeStart;    //время начала
 
-    //инициализируем
-    window.onload = init;
-    function init() {
-      window.AudioContext = window.AudioContext || window.webkitAudioContext;
-      context = new AudioContext();
-      analyser=context.createAnalyser();
-      analyser.connect(context.destination)
-      
-      urlCatalog=['_ghost_-_Reverie_(small_theme).mp3'];
-      
-      bufferLoader = new BufferLoader(context,urlCatalog[0]);
-      bufferLoader.load();
-    }
-
-    function connections(bufferList) {
-      source = context.createBufferSource();
-      source.buffer = bufferList;
-      source.connect(analyser);     
-    }
-    function deconnections(){
-      source.stop();
-      source=0;
-    }
-
-    var run =setInterval(checkAudio, 20);
-    function checkAudio(){
-      if(!source)return;
-      streamData=new Uint8Array(resultHelper*10);
-      result=[];
-
-      analyser.getByteFrequencyData(streamData);
-      for (var i = streamData.length - 1, index=0; i >= 0; i--){
-        index=parseInt(i/resultHelper);
-        //два варанта определения частоты 
-        //по среднему 
-        //result[index]?result[index]+= streamData[i]:result[index]=streamData[i];
-        //по максмальному
-        if(result[index]<streamData[i]||!result[index]){result[index]= streamData[i];}
-      }
-      for (var i =  result.length - 1; i >= 0; i--) {
-        //result[i]=(result[i]*25/resultHelper)>>6 ;// (result*100)/(resultHelper*256) ->((result*25)/resultHelper)>>6
-        result[i]=result[i]*100/256;
-      };
-      scene.jump(result);
-    }
-    function BufferLoader(context, url) {
-      this.context = context;
-      this.url = url;
-      this.bufferList = 0;
-      this.loadCount = 0;
-    }
-    BufferLoader.prototype.load = function() {
-      var request = new XMLHttpRequest();
-      request.open("GET", this.url, true);
-      request.responseType = "arraybuffer";
-
-    
-      var loader = this;
-
-      request.onload = function() {
-        // Asynchronously decode the audio file data in request.response
-        loader.context.decodeAudioData(
-          request.response,
-          function(buffer) {
-            if (!buffer) {
-              alert('error decoding file data: ' + this.url);
-              return;
-            }
-            loader.bufferList = buffer;
-            console.log('I do it!');
-            console.log(buffer);
-
-            rePlay(loader.bufferList);
-            
-          },
-          function(error) {
-            console.error('decodeAudioData error', error);
-          }
-        );
-      }
-
-      request.onerror = function() {
-        alert('BufferLoader: XHR error');
-      }
-      request.send();
-      request.onprogress = function(event) {
-        $("p").text( 'Получено с сервера ' + event.loaded + ' байт из ' + event.total );
-      }
-    }
-
-
-    function pause() {
-
-      // сначала засекаем время потом останавливаем , ибо потом пропадает пару милисекунд.
-      if(!source)return;
-      scene.jump([0,0,0,0,0,0,0,0,0,0]);
-      timeStop += context.currentTime - timeStart-0.4;
-      deconnections();
-    }
-    function play(buffer) {
-      buffer=buffer||bufferLoader.bufferList;
-      if(source||!buffer)return;
-      connections(buffer);
-      timeStart=context.currentTime;
-      source.start(0, timeStop % buffer.duration);
-      
-    }
-    function rePlay(buffer) {
-      buffer=buffer||bufferLoader.bufferList;
-      if(!buffer)return;
-      if(source)deconnections();
-      
-      resultHelper=parseInt((analyser.fftSize>>1)/10);
-      connections(buffer);
-      timeStop=0;
-      timeStart=context.currentTime;
-      source.start(0);
-    }
-  </script>
 </html>

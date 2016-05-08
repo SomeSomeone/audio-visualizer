@@ -33,12 +33,27 @@ body{
 .jump-box{
 	position: absolute;
     bottom: 25%;
-
     width: 5%;
-    background: hsla(250,100%,50%,1);
+  -webkit-transform-style: preserve-3d;
+  -moz-transform-style: preserve-3d;
+  -ms-transform-style: preserve-3d;
+  transform-style: preserve-3d;
+  -webkit-transform: rotateY(-10deg) rotateX(-10deg);
+  -moz-transform: rotateY(-10deg) rotateX(-10deg);
+  -ms-transform: rotateY(-10deg) rotateX(-10deg);
+  -o-transform: rotateY(-10deg) rotateX(-10deg);
+  transform: rotateY(-10deg) rotateX(-10deg);
 }
-.jump-box:after {
+.jump-box div:after {
   content: "";
   display: block;
   padding-bottom: 100%;
+}
+
+.jump-box div {
+width: 100%;
+  position: absolute;
+  border: 1px solid #000000;
+  text-align: center;
+  font-size: 13px;
 }
