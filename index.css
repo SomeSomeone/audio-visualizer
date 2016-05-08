@@ -34,8 +34,8 @@ body{
 	position: absolute;
     bottom: 25%;
 
-    width: 10%;
-    background: #FF0023;
+    width: 5%;
+    background: hsla(250,100%,50%,1);
 }
 .jump-box:after {
   content: "";

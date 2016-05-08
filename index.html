@@ -14,6 +14,7 @@
   </body>
   <script src="jquery-2.2.3.min.js" type="text/javascript"></script>
   <script type="text/javascript" src="jump-box.js"></script>
+  
   <script type="text/javascript">
     var scene;
     scene = new jumpBox();
@@ -28,6 +29,7 @@
     var bufferLoader; //для загрузки
     var streamData;   //свеже взятые данные с потока
     var result;       //подсчитанные данные
+    var resultHelper
     var urlCatalog;   //все ссылки
     var timeStop;     //время остановки
     var timeStart;    //время начала
@@ -59,18 +61,23 @@
     var run =setInterval(checkAudio, 20);
     function checkAudio(){
       if(!source)return;
-      streamData=new Uint8Array(125);
-      result=[0,0,0,0,0];
+      streamData=new Uint8Array(resultHelper*10);
+      result=[];
 
       analyser.getByteFrequencyData(streamData);
-      for (var i = streamData.length - 1; i >= 0; i--){
-        result[parseInt(i/25)]+= streamData[i];
+      for (var i = streamData.length - 1, index=0; i >= 0; i--){
+        index=parseInt(i/resultHelper);
+        //два варанта определения частоты 
+        //по среднему 
+        //result[index]?result[index]+= streamData[i]:result[index]=streamData[i];
+        //по максмальному
+        if(result[index]<streamData[i]||!result[index]){result[index]= streamData[i];}
       }
       for (var i =  result.length - 1; i >= 0; i--) {
-         result[i]>>=6 ;//    result/(25*256)*100 ->result/64 ->result>>6
+        //result[i]=(result[i]*25/resultHelper)>>6 ;// (result*100)/(resultHelper*256) ->((result*25)/resultHelper)>>6
+        result[i]=result[i]*100/256;
       };
       scene.jump(result);
-      $("h3").text( 'сейчас ' + result );
     }
     function BufferLoader(context, url) {
       this.context = context;
@@ -122,7 +129,7 @@
 
       // сначала засекаем время потом останавливаем , ибо потом пропадает пару милисекунд.
       if(!source)return;
-      scene.jump([0,0,0,0,0]);
+      scene.jump([0,0,0,0,0,0,0,0,0,0]);
       timeStop += context.currentTime - timeStart-0.4;
       deconnections();
     }
@@ -139,6 +146,7 @@
       if(!buffer)return;
       if(source)deconnections();
       
+      resultHelper=parseInt((analyser.fftSize>>1)/10);
       connections(buffer);
       timeStop=0;
       timeStart=context.currentTime;
