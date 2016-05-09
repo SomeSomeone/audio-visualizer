@@ -8,6 +8,7 @@ function jumpBox(){
 jumpBox.prototype.scene=function(place,opions){
 	var str='';
 	var size=(100/(this.countBoxes*2+1));
+
 	for (var i = 0; i < this.countBoxes; i++) 
 		str+='<div class="jump-box" style="left:'+(i*2+1)*size+'%;width:'+size+'%">'+
 		'<div class="front"></div>'+
@@ -18,10 +19,25 @@ jumpBox.prototype.scene=function(place,opions){
 		'<div class="back"></div>'+
 		'</div>';
 
-	$(place).append('<div class="jump-box-scene"><div class="jump-box-panel">'+str+'</div></div>');
+	$(place).append(
+		'<div class="jump-box-scene">'+
+			'<div class="jump-box-panel">'+str+
+				'<div class="jump-box-panel-front"></div>'+
+				'<div class="jump-box-panel-right"></div>'+
+				'<div class="jump-box-panel-top"></div>'+
+				'<div class="jump-box-panel-bottom"></div>'+
+				'<div class="jump-box-panel-left"></div>'+
+				'<div class="jump-box-panel-back"></div>'+
+			'</div>'+
+			'<div class="jump-box-menu">'+
+				'<button onclick="pause()">Stop</button>'+
+				'<button onclick="play()">Start</button>'+
+				'<button onclick="rePlay()">Re-Start</button>'+
+			'</div>'+
+		'</div>');
 	
 	//3D
-	translateZ=$(".front").width()/2;
+	var translateZ=$(".front").width()/2;
 	$(".front").css({
 		" -webkit-transform": "rotateY(0deg) translateZ("+translateZ+"px)",
   		"-moz-transform": "rotateY(0deg) translateZ("+translateZ+"px)",
@@ -64,6 +80,52 @@ jumpBox.prototype.scene=function(place,opions){
   		"-o-transform": "rotateX(-90deg) translateZ("+translateZ+"px)",
   		"transform": "rotateX(-90deg) translateZ("+translateZ+"px)"
 	})
+	var translateZPanelShort=$(".jump-box-panel-front").outerHeight()/2;
+	var translateZPanelLong=$(".jump-box-panel-front").outerWidth()-translateZPanelShort;
+	$(".jump-box-panel-front").css({
+		" -webkit-transform": "rotateY(0deg) translateZ("+translateZPanelShort+"px)",
+  		"-moz-transform": "rotateY(0deg) translateZ("+translateZPanelShort+"px)",
+  		"-ms-transform": "rotateY(0deg) translateZ("+translateZPanelShort+"px)",
+  		"-o-transform": "rotateY(0deg) translateZ("+translateZPanelShort+"px)",
+  		"transform": "rotateY(0deg) translateZ("+translateZPanelShort+"px)"
+	})
+	$(".jump-box-panel-back").css({
+		" -webkit-transform": "rotateY(180deg) translateZ("+translateZPanelShort+"px)",
+  		"-moz-transform": "rotateY(180deg) translateZ("+translateZPanelShort+"px)",
+  		"-ms-transform": "rotateY(180deg) translateZ("+translateZPanelShort+"px)",
+  		"-o-transform": "rotateY(180deg) translateZ("+translateZPanelShort+"px)",
+  		"transform": "rotateY(180deg) translateZ("+translateZPanelShort+"px)"
+	})
+	$(".jump-box-panel-right").css({
+		" -webkit-transform": "rotateY(90deg) translateZ("+translateZPanelLong+"px)",
+  		"-moz-transform": "rotateY(90deg) translateZ("+translateZPanelLong+"px)",
+  		"-ms-transform": "rotateY(90deg) translateZ("+translateZPanelLong+"px)",
+  		"-o-transform": "rotateY(90deg) translateZ("+translateZPanelLong+"px)",
+  		"transform": "rotateY(90deg) translateZ("+translateZPanelLong+"px)",
+  		"width":translateZPanelShort*2
+	})
+	$(".jump-box-panel-left").css({
+		" -webkit-transform": "rotateY(-90deg) translateZ("+translateZPanelLong+"px)",
+  		"-moz-transform": "rotateY(-90deg) translateZ("+translateZPanelLong+"px)",
+  		"-ms-transform": "rotateY(-90deg) translateZ("+translateZPanelLong+"px)",
+  		"-o-transform": "rotateY(-90deg) translateZ("+translateZPanelLong+"px)",
+  		"transform": "rotateY(-90deg) translateZ("+translateZPanelLong+"px)",
+  		"width":translateZPanelShort*2
+	})
+	$(".jump-box-panel-top").css({
+		" -webkit-transform": "rotateX(90deg) translateZ("+translateZPanelShort+"px)",
+  		"-moz-transform": "rotateX(90deg) translateZ("+translateZPanelShort+"px)",
+  		"-ms-transform": "rotateX(90deg) translateZ("+translateZPanelShort+"px)",
+  		"-o-transform": "rotateX(90deg) translateZ("+translateZPanelShort+"px)",
+  		"transform": "rotateX(90deg) translateZ("+translateZPanelShort+"px)"
+	})
+	$(".jump-box-panel-bottom").css({
+		" -webkit-transform": "rotateX(-90deg) translateZ("+translateZPanelShort+"px)",
+  		"-moz-transform": "rotateX(-90deg) translateZ("+translateZPanelShort+"px)",
+  		"-ms-transform": "rotateX(-90deg) translateZ("+translateZPanelShort+"px)",
+  		"-o-transform": "rotateX(-90deg) translateZ("+translateZPanelShort+"px)",
+  		"transform": "rotateX(-90deg) translateZ("+translateZPanelShort+"px)"
+	})
 	this.everyBoxes=$(".jump-box");
 	for (var i = this.everyBoxes.length - 1; i >= 0; i--) {
 		this.everyBoxesChildren[i]=$(this.everyBoxes[i]).children();
@@ -72,20 +134,10 @@ jumpBox.prototype.scene=function(place,opions){
 };
 
 jumpBox.prototype.jump=function(move){
-	this.everyBoxes.finish();//временное решение для плавности
-
-for (var i = this.everyBoxes.length - 1; i >= 0; i--) {
-	$(this.everyBoxes[i]).animate({bottom:  move[i]*5+25+"%",},500);
-	$(this.everyBoxesChildren[i]).css({"backgroundColor":  hslToRgb(240+move[i])})//пока под вопросом *просто весело же=)
-};
-	/*$.each( this.everyBoxes, function( key, value ) {
-
-		  $(this.everyBoxesChildren[key]).css({"backgroundColor":  hslToRgb(240+move[key])})//пока под вопросом *просто весело же=)
-		  $(value).animate({
-		  	bottom:  move[key]*5+25+"%",
-		  },750);
-	});
-*/
+	for (var i = this.everyBoxes.length - 1; i >= 0; i--) {
+		$(this.everyBoxes[i]).css({bottom:  move[i]*5+161+"%"});
+		$(this.everyBoxesChildren[i]).css({"backgroundColor":  hslToRgb(move[i]*2.5)})//пока под вопросом *просто весело же=)
+	};
 }
 
 function hslToRgb(h){
@@ -99,7 +151,7 @@ function hslToRgb(h){
     else if (h < 4)	r = 0, g = x, b = 1;
     else if (h < 5)	r = x, g = 0, b = 1;
     else 			r = 1, g = 0, b = x;
-    return "rgba("+Math.round(r * 255)+","+Math.round(g * 255)+","+Math.round(b * 255)+",0.9)";
+    return "rgba("+Math.round(r * 255)+","+Math.round(g * 255)+","+Math.round(b * 255)+",0.8)";
 }
 
 

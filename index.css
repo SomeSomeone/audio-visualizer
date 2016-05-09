@@ -4,13 +4,14 @@ body{
 
 #some-big-div{
 	background-color:black;
-/*	
+	
 	width:100%;
 	height:100vh;
-*/
+
+/*
 	width:90%;
 	height:90%;
-
+*/
 }
 
 
@@ -23,37 +24,60 @@ body{
 }
 .jump-box-panel{
 	position: absolute;
-    background: #272626;
+
     width: 80%;
     height: 12.5%;
-    bottom: 0;
+    bottom: 1%;
     left: 10%;
+    -webkit-transform-style: preserve-3d;
+    -moz-transform-style: preserve-3d;
+    -ms-transform-style: preserve-3d;
+    transform-style: preserve-3d;
+    -webkit-transform: rotateY(-10deg) rotateX(-10deg);
+    -moz-transform: rotateY(-10deg) rotateX(-10deg);
+    -ms-transform: rotateY(-10deg) rotateX(-10deg);
+    -o-transform: rotateY(-10deg) rotateX(-10deg);
+    transform: rotateY(-10deg) rotateX(-10deg);
 }
+.jump-box-panel>div:not(.jump-box){
+    box-sizing: border-box;
+    width: 100%;
+    height:100%;
+    background: #272626;
+    position: absolute;
+    border: 1px solid #000000;
+}
+.jump-box-panel-right,.jump-box-panel-left{
 
+}
 .jump-box{
-	position: absolute;
-    bottom: 25%;
+     border:none;
+    position: absolute;
+    bottom: 161%;
     width: 5%;
-  -webkit-transform-style: preserve-3d;
-  -moz-transform-style: preserve-3d;
-  -ms-transform-style: preserve-3d;
-  transform-style: preserve-3d;
-  -webkit-transform: rotateY(-10deg) rotateX(-10deg);
-  -moz-transform: rotateY(-10deg) rotateX(-10deg);
-  -ms-transform: rotateY(-10deg) rotateX(-10deg);
-  -o-transform: rotateY(-10deg) rotateX(-10deg);
-  transform: rotateY(-10deg) rotateX(-10deg);
+    -webkit-transform-style: preserve-3d;
+    -moz-transform-style: preserve-3d;
+    -ms-transform-style: preserve-3d;
+    transform-style: preserve-3d;
 }
 .jump-box div:after {
-  content: "";
-  display: block;
-  padding-bottom: 100%;
+    content: "";
+    display: block;
+    padding-bottom: 100%;
 }
 
 .jump-box div {
-width: 100%;
-  position: absolute;
-  border: 1px solid #000000;
-  text-align: center;
-  font-size: 13px;
+    box-sizing: border-box;
+    width: 100%;
+    position: absolute;
+    border: 1px solid #000000;
+}
+
+.jump-box-menu{
+     position: absolute;
+    width: 78.75%;
+    height: 12.5%;
+    bottom: 0;
+    left: 10%;
+    background: rgba(255,0,0,0.5);
 }
