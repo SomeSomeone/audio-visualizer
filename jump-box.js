@@ -4,6 +4,8 @@ function jumpBox(){
 	this.countBoxes=10;
 	this.everyBoxes=[];
 	this.everyBoxesChildren=[];
+	this.bottomDown;
+	window.addEventListener('resize', () => this.getSize());
 };
 jumpBox.prototype.scene=function(place,opions){
 	var str='';
@@ -34,112 +36,102 @@ jumpBox.prototype.scene=function(place,opions){
 				'<button onclick="play()">Start</button>'+
 				'<button onclick="rePlay()">Re-Start</button>'+
 			'</div>'+
-		'</div>');
-	
-	//3D
+		'</div>'
+	);
+
+	this.everyBoxes=$(".jump-box");
+	for (var i = this.everyBoxes.length - 1; i >= 0; i--) {
+		this.everyBoxesChildren[i]=$(this.everyBoxes[i]).children();
+	};
+	this.getSize();
+};
+jumpBox.prototype.getSize=function (){
 	var translateZ=$(".front").width()/2;
+	var translateZPanelShort=$(".jump-box-panel-front").outerHeight()/2;
+	var translateZPanelLong=$(".jump-box-panel-front").outerWidth()-translateZPanelShort;
+	this.bottomDown=(translateZPanelShort+translateZ+1)*2;
+	$(".jump-box").css({bottom:this.bottomDown+"px"})
 	$(".front").css({
 		" -webkit-transform": "rotateY(0deg) translateZ("+translateZ+"px)",
   		"-moz-transform": "rotateY(0deg) translateZ("+translateZ+"px)",
   		"-ms-transform": "rotateY(0deg) translateZ("+translateZ+"px)",
   		"-o-transform": "rotateY(0deg) translateZ("+translateZ+"px)",
-  		"transform": "rotateY(0deg) translateZ("+translateZ+"px)"
-	})
+  		"transform": "rotateY(0deg) translateZ("+translateZ+"px)"})
 	$(".back").css({
 		" -webkit-transform": "rotateY(180deg) translateZ("+translateZ+"px)",
   		"-moz-transform": "rotateY(180deg) translateZ("+translateZ+"px)",
   		"-ms-transform": "rotateY(180deg) translateZ("+translateZ+"px)",
   		"-o-transform": "rotateY(180deg) translateZ("+translateZ+"px)",
-  		"transform": "rotateY(180deg) translateZ("+translateZ+"px)"
-	})
+  		"transform": "rotateY(180deg) translateZ("+translateZ+"px)"})
 	$(".right").css({
 		" -webkit-transform": "rotateY(90deg) translateZ("+translateZ+"px)",
   		"-moz-transform": "rotateY(90deg) translateZ("+translateZ+"px)",
   		"-ms-transform": "rotateY(90deg) translateZ("+translateZ+"px)",
   		"-o-transform": "rotateY(90deg) translateZ("+translateZ+"px)",
-  		"transform": "rotateY(90deg) translateZ("+translateZ+"px)"
-	})
+  		"transform": "rotateY(90deg) translateZ("+translateZ+"px)"})
 	$(".left").css({
 		" -webkit-transform": "rotateY(-90deg) translateZ("+translateZ+"px)",
   		"-moz-transform": "rotateY(-90deg) translateZ("+translateZ+"px)",
   		"-ms-transform": "rotateY(-90deg) translateZ("+translateZ+"px)",
   		"-o-transform": "rotateY(-90deg) translateZ("+translateZ+"px)",
-  		"transform": "rotateY(-90deg) translateZ("+translateZ+"px)"
-	})
+  		"transform": "rotateY(-90deg) translateZ("+translateZ+"px)"})
 	$(".top").css({
 		" -webkit-transform": "rotateX(90deg) translateZ("+translateZ+"px)",
   		"-moz-transform": "rotateX(90deg) translateZ("+translateZ+"px)",
   		"-ms-transform": "rotateX(90deg) translateZ("+translateZ+"px)",
   		"-o-transform": "rotateX(90deg) translateZ("+translateZ+"px)",
-  		"transform": "rotateX(90deg) translateZ("+translateZ+"px)"
-	})
+  		"transform": "rotateX(90deg) translateZ("+translateZ+"px)"})
 	$(".bottom").css({
 		" -webkit-transform": "rotateX(-90deg) translateZ("+translateZ+"px)",
   		"-moz-transform": "rotateX(-90deg) translateZ("+translateZ+"px)",
   		"-ms-transform": "rotateX(-90deg) translateZ("+translateZ+"px)",
   		"-o-transform": "rotateX(-90deg) translateZ("+translateZ+"px)",
-  		"transform": "rotateX(-90deg) translateZ("+translateZ+"px)"
-	})
-	var translateZPanelShort=$(".jump-box-panel-front").outerHeight()/2;
-	var translateZPanelLong=$(".jump-box-panel-front").outerWidth()-translateZPanelShort;
+  		"transform": "rotateX(-90deg) translateZ("+translateZ+"px)"})
 	$(".jump-box-panel-front").css({
 		" -webkit-transform": "rotateY(0deg) translateZ("+translateZPanelShort+"px)",
   		"-moz-transform": "rotateY(0deg) translateZ("+translateZPanelShort+"px)",
   		"-ms-transform": "rotateY(0deg) translateZ("+translateZPanelShort+"px)",
   		"-o-transform": "rotateY(0deg) translateZ("+translateZPanelShort+"px)",
-  		"transform": "rotateY(0deg) translateZ("+translateZPanelShort+"px)"
-	})
+  		"transform": "rotateY(0deg) translateZ("+translateZPanelShort+"px)"})
 	$(".jump-box-panel-back").css({
 		" -webkit-transform": "rotateY(180deg) translateZ("+translateZPanelShort+"px)",
   		"-moz-transform": "rotateY(180deg) translateZ("+translateZPanelShort+"px)",
   		"-ms-transform": "rotateY(180deg) translateZ("+translateZPanelShort+"px)",
   		"-o-transform": "rotateY(180deg) translateZ("+translateZPanelShort+"px)",
-  		"transform": "rotateY(180deg) translateZ("+translateZPanelShort+"px)"
-	})
+  		"transform": "rotateY(180deg) translateZ("+translateZPanelShort+"px)"})
 	$(".jump-box-panel-right").css({
 		" -webkit-transform": "rotateY(90deg) translateZ("+translateZPanelLong+"px)",
   		"-moz-transform": "rotateY(90deg) translateZ("+translateZPanelLong+"px)",
   		"-ms-transform": "rotateY(90deg) translateZ("+translateZPanelLong+"px)",
   		"-o-transform": "rotateY(90deg) translateZ("+translateZPanelLong+"px)",
   		"transform": "rotateY(90deg) translateZ("+translateZPanelLong+"px)",
-  		"width":translateZPanelShort*2
-	})
+  		"width":translateZPanelShort*2})
 	$(".jump-box-panel-left").css({
 		" -webkit-transform": "rotateY(-90deg) translateZ("+translateZPanelLong+"px)",
   		"-moz-transform": "rotateY(-90deg) translateZ("+translateZPanelLong+"px)",
   		"-ms-transform": "rotateY(-90deg) translateZ("+translateZPanelLong+"px)",
   		"-o-transform": "rotateY(-90deg) translateZ("+translateZPanelLong+"px)",
   		"transform": "rotateY(-90deg) translateZ("+translateZPanelLong+"px)",
-  		"width":translateZPanelShort*2
-	})
+  		"width":translateZPanelShort*2})
 	$(".jump-box-panel-top").css({
 		" -webkit-transform": "rotateX(90deg) translateZ("+translateZPanelShort+"px)",
   		"-moz-transform": "rotateX(90deg) translateZ("+translateZPanelShort+"px)",
   		"-ms-transform": "rotateX(90deg) translateZ("+translateZPanelShort+"px)",
   		"-o-transform": "rotateX(90deg) translateZ("+translateZPanelShort+"px)",
-  		"transform": "rotateX(90deg) translateZ("+translateZPanelShort+"px)"
-	})
+  		"transform": "rotateX(90deg) translateZ("+translateZPanelShort+"px)"})
 	$(".jump-box-panel-bottom").css({
 		" -webkit-transform": "rotateX(-90deg) translateZ("+translateZPanelShort+"px)",
   		"-moz-transform": "rotateX(-90deg) translateZ("+translateZPanelShort+"px)",
   		"-ms-transform": "rotateX(-90deg) translateZ("+translateZPanelShort+"px)",
   		"-o-transform": "rotateX(-90deg) translateZ("+translateZPanelShort+"px)",
-  		"transform": "rotateX(-90deg) translateZ("+translateZPanelShort+"px)"
-	})
-	this.everyBoxes=$(".jump-box");
-	for (var i = this.everyBoxes.length - 1; i >= 0; i--) {
-		this.everyBoxesChildren[i]=$(this.everyBoxes[i]).children();
-	};
-
-};
-
+  		"transform": "rotateX(-90deg) translateZ("+translateZPanelShort+"px)"})
+}
 jumpBox.prototype.jump=function(move){
 	for (var i = this.everyBoxes.length - 1; i >= 0; i--) {
-		$(this.everyBoxes[i]).css({bottom:  move[i]*5+161+"%"});
+		$(this.everyBoxes[i]).css({bottom:  move[i]*5+this.bottomDown+"px"});
 		$(this.everyBoxesChildren[i]).css({"backgroundColor":  hslToRgb(move[i]*2.5)})//пока под вопросом *просто весело же=)
 	};
 }
-
 function hslToRgb(h){
     var r, g, b, x;
     if (!isFinite(h)) h = 0;
@@ -174,17 +166,24 @@ function hslToRgb(h){
     var timeStart;    //время начала
 
     //инициализируем
-    window.onload = init;
+    window.onload = function(){
+    	init();
+    	loadSong('_ghost_-_Reverie_(small_theme).mp3');
+    }
+
     function init() {
       window.AudioContext = window.AudioContext || window.webkitAudioContext;
       context = new AudioContext();
       analyser=context.createAnalyser();
       analyser.connect(context.destination)
-      
-      urlCatalog=['_ghost_-_Reverie_(small_theme).mp3'];
-      
-      bufferLoader = new BufferLoader(context,urlCatalog[0]);
-      bufferLoader.load();
+      bufferLoader = new BufferLoader(context);
+    }
+
+    function loadSong(url){
+      console.log("load Song begin");
+      console.log(Date.now());
+    	bufferLoader.URL(url);
+    	bufferLoader.load();
     }
 
     function connections(bufferList) {
@@ -219,9 +218,9 @@ function hslToRgb(h){
       };
       scene.jump(result);
     }
-    function BufferLoader(context, url) {
+    function BufferLoader(context) {
       this.context = context;
-      this.url = url;
+      this.url = '';
       this.bufferList = 0;
       this.loadCount = 0;
     }
@@ -229,10 +228,8 @@ function hslToRgb(h){
       var request = new XMLHttpRequest();
       request.open("GET", this.url, true);
       request.responseType = "arraybuffer";
-
-    
       var loader = this;
-
+      loader.bufferList=0;
       request.onload = function() {
         // Asynchronously decode the audio file data in request.response
         loader.context.decodeAudioData(
@@ -243,16 +240,16 @@ function hslToRgb(h){
               return;
             }
             loader.bufferList = buffer;
+            console.log(Date.now());
             console.log('I do it!');
-            console.log(buffer);
-
             rePlay(loader.bufferList);
-            
+            buffer=0;
           },
           function(error) {
             console.error('decodeAudioData error', error);
           }
         );
+        request=0;
       }
 
       request.onerror = function() {
@@ -264,6 +261,9 @@ function hslToRgb(h){
       }
     }
 
+    BufferLoader.prototype.URL=function(url){
+    	this.url=url;
+    }
 
     function pause() {
 
@@ -292,3 +292,14 @@ function hslToRgb(h){
       timeStart=context.currentTime;
       source.start(0);
     }
+
+$( "body" ).on( "change", "input[type=file]", function(event) {
+    var reader = new FileReader();    
+    console.log("new file detected");
+    console.log(Date.now());
+    reader.onload = function(){
+      loadSong(reader.result);
+      reader.result=0;
+    };
+    reader.readAsDataURL(event.target.files[0]);
+})
