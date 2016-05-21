@@ -73,10 +73,31 @@ body{
 }
 
 .jump-box-menu{
-     position: absolute;
-    width: 78.75%;
+    position: absolute;
+    width: 78.7846%;
     height: 12.5%;
     bottom: 0;
-    left: 10%;
-    background: rgba(255,0,0,0.5);
+    left: 9.39231%;
 }
+.jump-box-menu div:first-child {
+    display: flex;
+    margin: 1.5%;
+}
+.jump-box-menu div:first-child>* {
+    height: 50%;
+    width: 5%;
+    margin: 0 auto;
+    background: #FF5500;
+}
+/*
+.progress-bar{
+    background: gray;
+    height: 5%;
+}
+.progress-bar>div{
+    height: 100%;
+    padding: 0 5%;
+    background: #0055ff;
+    margin: 0;
+}
+*/

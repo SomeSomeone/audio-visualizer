@@ -1,12 +1,28 @@
 function jumpBox(){
-	this.place;
-	this.options={};
-	this.countBoxes=10;
+	this.place;//where
+
+	this.options={};//later
+	
+  this.countBoxes=10;
 	this.everyBoxes=[];
 	this.everyBoxesChildren=[];
-	this.bottomDown;
-	window.addEventListener('resize', () => this.getSize());
+	
+  this.bottomDown;//css buttom in px
+
+  //основные элементы
+  this.context;      //основной контекст
+  this.source;       //источик
+  this.analyser;     //аналзатор
+  this.buffer;       // realy?!
+
+  this.jumpTimer;// set interval
+  this.resultHelper;// parseInt((analyser.fftSize>>1)/10);
+  window.addEventListener('resize', () => this.getSize());
+
+  this.timeStop;
+  this.timeStart;
 };
+
 jumpBox.prototype.scene=function(place,opions){
 	var str='';
 	var size=(100/(this.countBoxes*2+1));
@@ -32,9 +48,13 @@ jumpBox.prototype.scene=function(place,opions){
 				'<div class="jump-box-panel-back"></div>'+
 			'</div>'+
 			'<div class="jump-box-menu">'+
-				'<button onclick="pause()">Stop</button>'+
-				'<button onclick="play()">Start</button>'+
-				'<button onclick="rePlay()">Re-Start</button>'+
+        '<div>'+
+  				'<div onclick="pause()">Stop</div>'+
+  				'<div onclick="play()">Start</div>'+
+  				'<div onclick="rePlay()">Re-Start</div>'+
+          '<input type="file">'+
+        '</div>'+
+        //'<div class="progress-bar"><div></div></div>'+
 			'</div>'+
 		'</div>'
 	);
@@ -43,6 +63,15 @@ jumpBox.prototype.scene=function(place,opions){
 	for (var i = this.everyBoxes.length - 1; i >= 0; i--) {
 		this.everyBoxesChildren[i]=$(this.everyBoxes[i]).children();
 	};
+
+  window.AudioContext = window.AudioContext || window.webkitAudioContext;
+  this.context = new AudioContext();
+  this.analyser=this.context.createAnalyser();
+  this.analyser.connect(this.context.destination);
+
+
+
+
 	this.getSize();
 };
 jumpBox.prototype.getSize=function (){
@@ -132,6 +161,101 @@ jumpBox.prototype.jump=function(move){
 		$(this.everyBoxesChildren[i]).css({"backgroundColor":  hslToRgb(move[i]*2.5)})//пока под вопросом *просто весело же=)
 	};
 }
+jumpBox.prototype.loadSong=function(url){
+  this.load(url);
+}
+jumpBox.prototype.load = function(url) {
+  var request = new XMLHttpRequest();
+  request.open("GET", url, true);
+  request.responseType = "arraybuffer";
+  var loader = this;
+  request.onload = function() {
+    loader.context.decodeAudioData(
+      request.response,
+      function(buffer) {
+        if (!buffer) {
+          alert('error decoding file data: ' + this.url);
+          return;
+        }
+        loader.buffer = buffer;
+        loader.afterLoad();
+      },
+      function(error) {
+        console.error('decodeAudioData error', error);
+      }
+    );
+    request=0;
+  }
+
+  request.onerror = function() {
+    alert('jumpBox: XHR error\n you can load local files');
+  }
+  request.send();
+  /*request.onprogress = function(event) {
+    $("p").text( 'Получено с сервера ' + event.loaded + ' байт из ' + event.total );
+  }*/
+}
+jumpBox.prototype.connections=function() {
+  if(!this.buffer)return;
+  this.source = this.context.createBufferSource();
+  this.source.buffer = this.buffer;
+  this.source.connect(this.analyser);     
+}
+
+jumpBox.prototype.deconnections=function(){
+  this.source.stop();
+  this.source=0;
+}
+
+jumpBox.prototype.checkAudio=function(){
+  if(!this.source)return;
+  var streamData=new Uint8Array(this.resultHelper*10);
+  var result=[];
+
+  this.analyser.getByteFrequencyData(streamData);
+  for (var i = streamData.length - 1, index=0; i >= 0; i--){
+    var index=parseInt(i/this.resultHelper);
+    if(result[index]<streamData[i]||!result[index])
+      result[index]= streamData[i]
+  }
+  for (var i =  result.length - 1; i >= 0; i--) 
+    result[i]=(result[i]*100)>>8;
+
+  this.jump(result);
+}
+jumpBox.prototype.pause=function() {
+  // сначала засекаем время потом останавливаем , ибо потом пропадает пару милисекунд.
+  if(!this.source)return;
+  scene.jump([0,0,0,0,0,0,0,0,0,0]);//need function
+  console.log(this.context.currentTime)
+  console.log(this.timeStart)
+  this.timeStop = this.context.currentTime - this.timeStart;//
+  this.deconnections();
+}
+jumpBox.prototype.play=function() {//bufer in jump box?
+  if(this.source||!this.buffer)return;
+  this.connections();
+  this.timeStart=this.context.currentTime;
+  console.log(this.timeStop);
+  console.log(this.buffer.duration);
+  console.log(this.timeStop % this.buffer.duration);
+  this.source.start(0, this.timeStop % this.buffer.duration);
+}
+jumpBox.prototype.rePlay=function(){//need 2 function for start at 0 and new buffer
+  try{
+    this.pause();
+  }catch(b){};
+  if(!this.source)this.connections();
+  this.timeStart=this.context.currentTime;
+  timeStop=0;
+  timeStart=this.context.currentTime;
+  this.source.start(0);
+}
+jumpBox.prototype.afterLoad=function(){
+  if(!this.buffer)return;
+  this.resultHelper=parseInt((this.analyser.fftSize>>1)/10);
+  this.rePlay();
+}
 function hslToRgb(h){
     var r, g, b, x;
     if (!isFinite(h)) h = 0;
@@ -148,157 +272,36 @@ function hslToRgb(h){
 
 
     var scene;
-    scene = new jumpBox();
-    scene.scene(document.getElementById('some-big-div'));//, {/*some options*/ });
-    // создаем аудио контекст
-    
-    //основные элементы
-    var context;      //основной контекст
-    var source;       //источик
-    var analyser;     //аналзатор
-    //помошники
-    var bufferLoader; //для загрузки
-    var streamData;   //свеже взятые данные с потока
-    var result;       //подсчитанные данные
-    var resultHelper;
-    var urlCatalog;   //все ссылки
-    var timeStop;     //время остановки
-    var timeStart;    //время начала
-
     //инициализируем
     window.onload = function(){
     	init();
-    	loadSong('_ghost_-_Reverie_(small_theme).mp3');
+      scene.loadSong('_ghost_-_Reverie_(small_theme).mp3');
     }
 
     function init() {
-      window.AudioContext = window.AudioContext || window.webkitAudioContext;
-      context = new AudioContext();
-      analyser=context.createAnalyser();
-      analyser.connect(context.destination)
-      bufferLoader = new BufferLoader(context);
+      scene = new jumpBox();
+      scene.scene(document.getElementById('some-big-div'))
     }
 
-    function loadSong(url){
-      console.log("load Song begin");
-      console.log(Date.now());
-    	bufferLoader.URL(url);
-    	bufferLoader.load();
+    var run =setInterval(function(){
+      scene.checkAudio();
+    },40);
+   function pause() {
+      scene.pause();
     }
-
-    function connections(bufferList) {
-      source = context.createBufferSource();
-      source.buffer = bufferList;
-      source.connect(analyser);     
+    function play() {
+      scene.play();
     }
-    function deconnections(){
-      source.stop();
-      source=0;
+    function rePlay() {
+      scene.rePlay();
     }
-
-    var run =setInterval(checkAudio,20);
-    function checkAudio(){
-      if(!source)return;
-      streamData=new Uint8Array(resultHelper*10);
-      result=[];
-
-      analyser.getByteFrequencyData(streamData);
-      for (var i = streamData.length - 1, index=0; i >= 0; i--){
-        index=parseInt(i/resultHelper);
-        /*
-          //два варанта определения частоты 
-          //по среднему 
-          //result[index]?result[index]+= streamData[i]:result[index]=streamData[i];
-          //по максмальному*/
-        if(result[index]<streamData[i]||!result[index]){result[index]= streamData[i];}
-      }
-      for (var i =  result.length - 1; i >= 0; i--) {
-        //result[i]=(result[i]*25/resultHelper)>>6 ;// (result*100)/(resultHelper*256) ->((result*25)/resultHelper)>>6
-        result[i]=(result[i]*100)>>8;
-      };
-      scene.jump(result);
-    }
-    function BufferLoader(context) {
-      this.context = context;
-      this.url = '';
-      this.bufferList = 0;
-      this.loadCount = 0;
-    }
-    BufferLoader.prototype.load = function() {
-      var request = new XMLHttpRequest();
-      request.open("GET", this.url, true);
-      request.responseType = "arraybuffer";
-      var loader = this;
-      loader.bufferList=0;
-      request.onload = function() {
-        // Asynchronously decode the audio file data in request.response
-        loader.context.decodeAudioData(
-          request.response,
-          function(buffer) {
-            if (!buffer) {
-              alert('error decoding file data: ' + this.url);
-              return;
-            }
-            loader.bufferList = buffer;
-            console.log(Date.now());
-            console.log('I do it!');
-            rePlay(loader.bufferList);
-            buffer=0;
-          },
-          function(error) {
-            console.error('decodeAudioData error', error);
-          }
-        );
-        request=0;
-      }
-
-      request.onerror = function() {
-        alert('BufferLoader: XHR error');
-      }
-      request.send();
-      request.onprogress = function(event) {
-        $("p").text( 'Получено с сервера ' + event.loaded + ' байт из ' + event.total );
-      }
-    }
-
-    BufferLoader.prototype.URL=function(url){
-    	this.url=url;
-    }
-
-    function pause() {
-
-      // сначала засекаем время потом останавливаем , ибо потом пропадает пару милисекунд.
-      if(!source)return;
-      scene.jump([0,0,0,0,0,0,0,0,0,0]);
-      timeStop += context.currentTime - timeStart-0.4;
-      deconnections();
-    }
-    function play(buffer) {
-      buffer=buffer||bufferLoader.bufferList;
-      if(source||!buffer)return;
-      connections(buffer);
-      timeStart=context.currentTime;
-      source.start(0, timeStop % buffer.duration);
-      
-    }
-    function rePlay(buffer) {
-      buffer=buffer||bufferLoader.bufferList;
-      if(!buffer)return;
-      if(source)deconnections();
-      
-      resultHelper=parseInt((analyser.fftSize>>1)/10);
-      connections(buffer);
-      timeStop=0;
-      timeStart=context.currentTime;
-      source.start(0);
-    }
-
+    
 $( "body" ).on( "change", "input[type=file]", function(event) {
     var reader = new FileReader();    
     console.log("new file detected");
     console.log(Date.now());
     reader.onload = function(){
-      loadSong(reader.result);
+      scene.loadSong(reader.result);
       reader.result=0;
     };
     reader.readAsDataURL(event.target.files[0]);
