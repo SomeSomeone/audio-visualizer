@@ -46,9 +46,6 @@ body{
     position: absolute;
     border: 1px solid #000000;
 }
-.jump-box-panel-right,.jump-box-panel-left{
-
-}
 .jump-box{
      border:none;
     position: absolute;
@@ -82,14 +79,14 @@ body{
     display: flex;
     margin: 1.5%;
 }
-.jump-box-menu div:first-child>* {
+.jump-box-menu div:first-child>*:not(img) {
     height: 50%;
-    width: 4%;
+    width: 6%;
     margin: 0 auto;
 }
-.jump-box-menu div:first-child img{
+.jump-box-menu  img{
     height:100%;
-    width:100%;
+    width: initial;
     cursor: pointer;
 }
 label.uploadbutton {
