@@ -7,7 +7,6 @@ body{
 	
 	width:100%;
 	height:100vh;
-
 /*
 	width:90%;
 	height:90%;
@@ -20,7 +19,7 @@ body{
     position: relative;
     width: 100%;
     height: 100%;
-    background: #F9A006;
+    background: #CCCCCC;
 }
 .jump-box-panel{
 	position: absolute;
@@ -43,7 +42,7 @@ body{
     box-sizing: border-box;
     width: 100%;
     height:100%;
-    background: #272626;
+    background: #333333;
     position: absolute;
     border: 1px solid #000000;
 }
@@ -85,10 +84,24 @@ body{
 }
 .jump-box-menu div:first-child>* {
     height: 50%;
-    width: 5%;
+    width: 4%;
     margin: 0 auto;
-    background: #FF5500;
 }
+.jump-box-menu div:first-child img{
+    height:100%;
+    width:100%;
+    cursor: pointer;
+}
+label.uploadbutton {
+    display: inline-block;
+    overflow: hidden;
+}
+
+label.uploadbutton input {
+    display: none;   
+}
+
+
 /*
 .progress-bar{
     background: gray;

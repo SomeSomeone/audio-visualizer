@@ -49,10 +49,10 @@ jumpBox.prototype.scene=function(place,opions){
 			'</div>'+
 			'<div class="jump-box-menu">'+
         '<div>'+
-  				'<div onclick="pause()">Stop</div>'+
-  				'<div onclick="play()">Start</div>'+
-  				'<div onclick="rePlay()">Re-Start</div>'+
-          '<input type="file">'+
+  				'<div onclick="pause()"><img src="icons/player_pause.png"></div>'+
+  				'<div onclick="play()"><img src="icons/player_play.png"></div>'+
+  				'<div onclick="rePlay()"><img src="icons/player_stop.png"></div>'+
+          '<label class="uploadbutton"><div class="button" ><img src="icons/player_eject.png"></div><input type="file" accepy="audio/*"/></label>'+
         '</div>'+
         //'<div class="progress-bar"><div></div></div>'+
 			'</div>'+
@@ -227,8 +227,6 @@ jumpBox.prototype.pause=function() {
   // сначала засекаем время потом останавливаем , ибо потом пропадает пару милисекунд.
   if(!this.source)return;
   scene.jump([0,0,0,0,0,0,0,0,0,0]);//need function
-  console.log(this.context.currentTime)
-  console.log(this.timeStart)
   this.timeStop = this.context.currentTime - this.timeStart;//
   this.deconnections();
 }
@@ -236,9 +234,6 @@ jumpBox.prototype.play=function() {//bufer in jump box?
   if(this.source||!this.buffer)return;
   this.connections();
   this.timeStart=this.context.currentTime;
-  console.log(this.timeStop);
-  console.log(this.buffer.duration);
-  console.log(this.timeStop % this.buffer.duration);
   this.source.start(0, this.timeStop % this.buffer.duration);
 }
 jumpBox.prototype.rePlay=function(){//need 2 function for start at 0 and new buffer
@@ -298,8 +293,8 @@ function hslToRgb(h){
     
 $( "body" ).on( "change", "input[type=file]", function(event) {
     var reader = new FileReader();    
-    console.log("new file detected");
-    console.log(Date.now());
+    alert("new file detected\n start loading...");
+    scene.pause();
     reader.onload = function(){
       scene.loadSong(reader.result);
       reader.result=0;
